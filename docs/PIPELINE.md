@@ -41,7 +41,7 @@ npx playwright install chromium
 npm run test:e2e
 ```
 
-`check` runs ESLint, `tsc --noEmit`, Vitest, and `next build --webpack`. Browser tests require that build and start a production server on `127.0.0.1:3107`; reserve the port. They clear Supabase public variables to test demo/failure behavior on desktop Chromium and Pixel 7 emulation.
+`check` runs ESLint, `tsc --noEmit`, Vitest, and `next build --webpack`. Browser tests require that build and start a production server on `127.0.0.1:3107`; reserve the port. The fallback test intercepts PostgREST menu requests with a deterministic HTTP 400 before navigation; no real database access is required for that regression check. Next.js embeds public variables at build time, so the runtime blank values in the test server configuration do not remove values already compiled into the build. These tests cover desktop Chromium and Pixel 7 emulation, not live database correctness.
 
 `.github/workflows/pipeline.yml` runs on pushes to `main`, `develop`, `feature/**`, and `fix/**`, PRs targeting `develop`/`main`, and manual dispatch. `Quality gate` uses Node 22, installs from the lockfile, runs `check`, installs Chromium with system dependencies, and runs browser tests. Failure artifacts are retained for seven days.
 
@@ -60,15 +60,32 @@ Never expose database passwords, secret keys, or service-role keys in browser va
 
 ## Vercel setup and rollout
 
-1. Create a Vercel project tied to the repository, select Next.js, Node 22, and production branch `main`. Configure both public Supabase variables in Preview and Production, preferably using separate database projects. Public variables are embedded at build time; rebuild after changes.
+The existing Vercel project `repo-test` in `francis-s-projects1` is connected to this GitHub repository with production branch `main`. The project framework is Next.js and Node version is now `22.x`; `package.json` and its lockfile also pin `22.x`. The local CLI link is in ignored `.vercel/`.
+
+A manual CLI [preview](https://repo-test-epqsjv6hg-francis-s-projects1.vercel.app) reached READY and passed protected desktop/mobile rendering checks. Vercel SSO remains enabled, so normal preview access requires Vercel sign-in. See [the deployment report](features/vercel-deployment.md). No production release or observed GitHub Actions deployment occurred.
+
+1. Use the existing project. Both public Supabase variable names already exist as secret values in Vercel Preview and Production. The configured hostname currently returns NXDOMAIN, so live data remains blocked despite variables being present. Confirm the exact Project URL in the active Supabase project's Settings → Data API, update `NEXT_PUBLIC_SUPABASE_URL` in `.env.local` and both Vercel environments, confirm the matching publishable key, then rebuild/redeploy and repeat live QA. Prefer separate staging/production databases. Public variables are embedded at build time; changing runtime values alone does not repair an existing build.
 2. Configure GitHub repository/environment secrets `VERCEL_TOKEN`, `VERCEL_ORG_ID`, and `VERCEL_PROJECT_ID`. The workflow uses GitHub `preview` and `production` environments, allowing environment-specific credentials. Configure production environment approval rules if desired.
 3. Leave repository variable `VERCEL_DEPLOY_ENABLED` unset until credentials, environment variables, database permissions, and project settings are ready. Set it to literal `true` to enable deployment.
-4. Integrate tested features into `develop`. After that push's quality job succeeds, deployment uses the lockfile-installed Vercel CLI to pull Preview settings, build, and deploy prebuilt output. Verify the URL in the workflow summary and exercise live reads.
-5. On an explicit release request, integrate tested `develop` into `main`. After quality succeeds, the workflow builds/deploys Production using `--prod`. Verify the public URL and live reads.
+4. Integrate tested features into `develop`. After that push's quality job succeeds, deployment uses the lockfile-installed Vercel CLI to submit a remote source build with `vercel deploy --yes --target=preview`. Vercel builds with the project’s Preview environment values. Verify the URL in the workflow summary and exercise live reads.
+5. On an explicit release request, integrate tested `develop` into `main`. After quality succeeds, the workflow submits a remote source build using `vercel deploy --yes --prod`, with Production environment values. Verify the public URL and live reads.
+
+Preview/Production public variables are currently stored as Secret values in Vercel. In the observed CLI pull, these became `[SENSITIVE]` placeholders rather than usable local build values. The workflow therefore uses hosted source builds, avoiding a prebuilt client bundle with those placeholders. The manual cloud Preview verified this deployment method; GitHub Actions execution is still unobserved.
 
 `vercel.json` disables native Git deployments to avoid duplicate ungated deployments. Feature branches and PRs run checks but do not deploy. Manual dispatch runs quality but does not deploy: deployment requires a push event. Deployment depends on quality; the documentation check is enforced through protected PRs. A local build does not prove deployment.
 
-For rollback, disable `VERCEL_DEPLOY_ENABLED` if necessary to stop further deployments and restore a known-good prior deployment through Vercel controls. Revert application changes through a reviewed feature/PR and QA. Prefer reviewed forward database fixes; assess compatibility and backups before database changes. Vercel account/project setup, secrets, deployments, and rollback remain unverified.
+For an explicitly requested manual Preview deployment after local QA, use the existing CLI login and project link:
+
+```sh
+npx --no-install vercel link --yes --project repo-test --scope francis-s-projects1
+npm run check
+npm run test:e2e
+npx --no-install vercel deploy --yes --scope francis-s-projects1
+```
+
+Omitting `--prod` keeps this a Preview deployment. Verify READY status, authenticated HTTP/browser access, and the live menu separately. The CLI may add an OIDC token to ignored `.env.local`; keep that file, `.vercel/`, protection-bypass tokens, session cookies, and verification artifacts out of Git. Preview verification used authorized automated protection access without disabling SSO.
+
+For rollback, disable `VERCEL_DEPLOY_ENABLED` if necessary to stop further deployments and restore a known-good prior deployment through Vercel controls. Revert application changes through a reviewed feature/PR and QA. Prefer reviewed forward database fixes; assess compatibility and backups before database changes. The protected CLI preview is verified; automatic deployment credentials/enablement, production deployment, live database integration, and rollback execution remain unverified.
 
 ## References
 

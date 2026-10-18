@@ -14,7 +14,12 @@ test("menu is readable on desktop and mobile", async ({ page }, testInfo) => {
   expect(errors).toEqual([]);
 });
 
-test("missing Supabase configuration has a clear fallback", async ({ page }) => {
+test("failed Supabase menu request has a clear fallback", async ({ page }) => {
+  await page.route("**/rest/v1/menu_items**", route => route.fulfill({
+    status: 400,
+    contentType: "application/json",
+    body: JSON.stringify({ message: "Menu temporarily unavailable" }),
+  }));
   await page.goto("/");
   const loadButton = page.getByRole("button", { name: "Load live menu" });
   await page.keyboard.press("Tab");

@@ -31,4 +31,6 @@ The primary agent coordinates three project agents: `git_workflow` branches from
 
 Definitions live in `AGENTS.md`, `.codex/config.toml`, and `.codex/agents/*.toml`. These are Codex session agents, not unattended GitHub bots. Custom-agent discovery may require a session restart; clients without custom-agent loading must spawn agents with the corresponding TOML instructions explicitly. GitHub Actions runs deterministic checks and optional deployments.
 
-See [pipeline setup and rollout](docs/PIPELINE.md), [QA evidence and limitations](docs/features/coffee-shop-pipeline.md), and [the changelog](CHANGELOG.md). Local scaffold QA passed. Live Supabase, remote CI, branch protection, and Vercel deployment still require external setup or verification.
+A protected [Vercel preview](https://repo-test-epqsjv6hg-francis-s-projects1.vercel.app) is deployed and verified on desktop/mobile; Vercel sign-in is required. This is a preview, not a production release. Live menu loading currently falls back because the configured Supabase hostname does not resolve.
+
+See [pipeline setup and rollout](docs/PIPELINE.md), [deployment QA and the database blocker](docs/features/vercel-deployment.md), [initial scaffold evidence](docs/features/coffee-shop-pipeline.md), and [the changelog](CHANGELOG.md). GitHub Actions deployment credentials/enablement, branch protection, and live database validation remain pending or unverified.

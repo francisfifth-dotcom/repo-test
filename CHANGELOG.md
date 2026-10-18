@@ -7,3 +7,11 @@
 - Added QA, documentation, and Git workflow session agents for tested features branching from `develop` and release-only promotion to `main`.
 - Added npm checks, unit tests, desktop/mobile browser tests, a PR documentation gate, and opt-in quality-gated Vercel deployments.
 - Documented setup, QA evidence, deployment, rollback, and external setup gaps. Local QA passed; live database, remote CI/settings, and deployment remain unverified.
+
+### Vercel preview deployment
+
+- Pinned package and Vercel Node versions to `22.x` and configured the existing project as Next.js.
+- Deployed and checked a protected Vercel Preview on desktop/mobile; production remains unchanged.
+- Changed workflow deployments to Vercel-hosted source builds so Secret environment values are resolved remotely instead of embedding pulled placeholders.
+- Made the fallback browser regression deterministic with an intercepted PostgREST error, accounting for build-time public variables.
+- Recorded the live Supabase blocker: the configured hostname returns NXDOMAIN. Correct project settings and repeat live integration QA before claiming database readiness.
