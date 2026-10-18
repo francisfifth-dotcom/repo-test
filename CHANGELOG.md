@@ -21,3 +21,10 @@
 - Corrected the configured hosted project URL suffix to `.supabase.co`, preserving the matching key, and rebuilt the protected Preview.
 - Applied the existing menu migration and seed through the SQL editor; verified three live menu rows and inspected RLS/grant metadata.
 - Verified actual desktop/mobile cloud live reads and local regression checks. Isolated database/negative API tests and production rollout remain unverified.
+
+## Production release — 2026-10-18
+
+- Released current `main` to the public production alias after passing local QA and observed GitHub Actions quality checks.
+- Verified desktop/mobile access and actual live Supabase menu reads without authentication.
+- Diagnosed the screenshot’s `NEXT_NO_VERSION` as an old deployment from the initial repository commit; current app dependencies/configuration required no change.
+- Automatic deployment remains disabled; release used the Vercel CLI. Historical feature notes above preserve their original verification state.
