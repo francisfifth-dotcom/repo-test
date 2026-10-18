@@ -1,5 +1,7 @@
 # Feature: Protected Vercel preview deployment
 
+Historical report: the DNS/database blocker below was resolved in the subsequent [Supabase connection feature](supabase-vercel-connection.md). This report preserves the earlier observed state.
+
 Date: 2026-10-18 (Asia/Manila)
 Branch: `feature/vercel-deployment`, from `develop` at `3b5660d`
 QA status: PASS for deployment/rendering and local regression checks; BLOCKED for live Supabase integration.

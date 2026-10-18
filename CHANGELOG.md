@@ -15,3 +15,9 @@
 - Changed workflow deployments to Vercel-hosted source builds so Secret environment values are resolved remotely instead of embedding pulled placeholders.
 - Made the fallback browser regression deterministic with an intercepted PostgREST error, accounting for build-time public variables.
 - Recorded the live Supabase blocker: the configured hostname returns NXDOMAIN. Correct project settings and repeat live integration QA before claiming database readiness.
+
+### Supabase connection correction
+
+- Corrected the configured hosted project URL suffix to `.supabase.co`, preserving the matching key, and rebuilt the protected Preview.
+- Applied the existing menu migration and seed through the SQL editor; verified three live menu rows and inspected RLS/grant metadata.
+- Verified actual desktop/mobile cloud live reads and local regression checks. Isolated database/negative API tests and production rollout remain unverified.
