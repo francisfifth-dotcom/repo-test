@@ -85,14 +85,10 @@ jobs:
       - name: Deploy preview
         if: github.ref == 'refs/heads/develop'
         run: |
-          npx --no-install vercel pull --yes --environment=preview --token="$VERCEL_TOKEN"
-          npx --no-install vercel build --token="$VERCEL_TOKEN"
-          npx --no-install vercel deploy --prebuilt --token="$VERCEL_TOKEN" > deployment-url.txt
+          npx --no-install vercel deploy --yes --target=preview --token="$VERCEL_TOKEN" > deployment-url.txt
       - name: Deploy production
         if: github.ref == 'refs/heads/main'
         run: |
-          npx --no-install vercel pull --yes --environment=production --token="$VERCEL_TOKEN"
-          npx --no-install vercel build --prod --token="$VERCEL_TOKEN"
-          npx --no-install vercel deploy --prebuilt --prod --token="$VERCEL_TOKEN" > deployment-url.txt
+          npx --no-install vercel deploy --yes --prod --token="$VERCEL_TOKEN" > deployment-url.txt
       - name: Record deployment URL
         run: cat deployment-url.txt >> "$GITHUB_STEP_SUMMARY"
